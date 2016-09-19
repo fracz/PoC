@@ -1,0 +1,9 @@
+auth:
+    resource: "@AppBundle/Controller/AuthController.php"
+    type: annotation
+    prefix: api
+
+cats:
+    resource: "@AppBundle/Controller/CatsController.php"
+    type: annotation
+    prefix: api

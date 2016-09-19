@@ -1,0 +1,8 @@
+services:
+    user_credentials.factory:
+        class: AppBundle\Service\UserCredentialsFactory
+        arguments:
+            - "@security.password_encoder"
+
+    token_generator:
+        class: AppBundle\Token\FirebaseTokenGeneratorAdapter

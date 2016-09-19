@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>REPEKA Cats</title>
+    <link type="text/css" rel="stylesheet" href="bower_components/materialize/dist/css/materialize.min.css"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+<div class="container" id="app">
+    <h1>Repeka Cats</h1>
+    <div class="row">
+        <div class="col s6" v-if="!token">
+            <h3>Zaloguj się</h3>
+            <form v-on:submit.prevent="login()">
+                <div class="input-field">
+                    <i class="material-icons prefix">account_circle</i>
+                    <input type="text" name="username" id="username" v-model="username">
+                    <label for="username">Nazwa użytkownika</label>
+                </div>
+                <div class="input-field">
+                    <i class="material-icons prefix">vpn_key</i>
+                    <input type="password" name="password" id="password" v-model="password">
+                    <label for="password">Hasło</label>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit" name="action">
+                    Zaloguj
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+        </div>
+        <div class="col s6" v-if="token">
+            <h2>Zalogowano!</h2>
+            <table>
+                <tbody>
+                <tr>
+                    <th scope="row">Użytkownik</th>
+                    <td>{{ token.username }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Ważny do</th>
+                    <td>{{ token.exp | date }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <a class="waves-effect waves-light btn red orange"
+               v-on:click="logout()">
+                <i class="material-icons left">send</i>
+                Wyloguj
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s6">
+            <h4>Ulubione koty</h4>
+            <div class="card-panel orange" v-if="!favourites.length">
+                <span class="white-text">Dodaj jakiegoś kota :-)</span>
+            </div>
+            <div class="row">
+                <div class="col s6" v-for="i in [1,0]">
+                    <div class="card" v-for="cat in favourites" v-show="$index % 2 - i">
+                        <div class="card-image waves-effect waves-block waves-light">
+                            <img class="activator" src="{{ cat.url }}">
+                        </div>
+                        <div class="card-reveal">
+                            <span class="card-title grey-text text-darken-4">ID: {{ cat.id }}<i
+                                    class="material-icons right">close</i></span>
+                            <p>@{{ cat.creator }}, {{ cat.created | date }}</p>
+                            <p><a class="waves-effect waves-light btn red right"
+                               v-on:click="delete(cat)">
+                                <i class="material-icons left">delete</i>
+                                Usuń
+                            </a></p><br />
+                            <p><a class="waves-effect waves-light btn red right"
+                               v-on:click="change(cat)">
+                                Zmień zdjęcie
+                            </a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col s6">
+            <h4>Nowy kot z API</h4>
+
+            <a class="waves-effect waves-light btn red" v-bind:class="{ 'green': token, 'red': !token }"
+               v-on:click="getNewRandomCat()">
+                <i class="material-icons left">loop</i>
+                Pobierz
+            </a>
+            <div v-if="newCatUrl">
+                <div class="card">
+                    <div class="card-image">
+                        <img src="{{ newCatUrl }}">
+                    </div>
+                    <div class="card-action">
+                        <a v-on:click="addToFavourites()" class="btn">
+                            <i class="material-icons left">star</i>
+                            Dodaj do ulubionych
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/jwt-decode/build/jwt-decode.min.js"></script>
+<script src="bower_components/materialize/dist/js/materialize.min.js"></script>
+<script src="bower_components/vue/dist/vue.min.js"></script>
+<script src="bower_components/vue-resource/dist/vue-resource.min.js"></script>
+
+<script>
+//    var prefix = 'app_dev.php';
+    var prefix = '';
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            username: '',
+            password: '',
+            token: undefined,
+            newCatUrl: undefined,
+            favourites: []
+        },
+        methods: {
+            login: function () {
+                console.time('Logowanie');
+                this.$http.post(prefix + '/api/token', {username: this.username, password: this.password})
+                        .then(function (response) {
+                            console.timeEnd('Logowanie');
+                            app.username = app.password = '';
+                            response.json().then(function (r) {
+                                localStorage.setItem('token', r.token);
+                                app.tokenRaw = r.token;
+                                app.token = jwt_decode(r.token);
+                            });
+                        }, function () {
+                            console.timeEnd('Logowanie');
+                            alert("Logowanie nieudane");
+                        });
+            },
+            logout: function () {
+                localStorage.removeItem('token');
+                app.tokenRaw = app.token = null;
+            },
+            getNewRandomCat: function () {
+                console.time('Pobranie nowego kota');
+                this.$http.get(prefix + '/api/cats/random', {headers: {Authorization: 'Bearer ' + this.tokenRaw}}).then(function (data) {
+                    console.timeEnd('Pobranie nowego kota');
+                    data.json().then(function (r) {
+                        console.log(r);
+                        app.newCatUrl = r.url;
+                    });
+                }, function () {
+                    console.timeEnd('Pobranie nowego kota');
+                    alert("DOSTĘP ZABRONIONY");
+                    app.secret = null;
+                });
+            },
+            addToFavourites: function () {
+                var newCat = {
+                    id: 'nieznane',
+                    url: this.newCatUrl
+                };
+                console.time('Dodawanie kota do ulubionych');
+                this.$http.post(prefix + '/api/cats', newCat, {headers: {Authorization: 'Bearer ' + this.tokenRaw}}).then(function (data) {
+                    console.timeEnd('Dodawanie kota do ulubionych');
+                    app.newCatUrl = undefined;
+                    data.json().then(function (cat) {
+                        app.favourites.push(cat);
+                    });
+                }, function () {
+                    console.timeEnd('Dodawanie kota do ulubionych');
+                    alert("Błąd przy dodawaniu kota");
+                    app.favourites.splice(app.favourites.indexOf(newCat), 1);
+                });
+            },
+            delete: function (cat) {
+                console.time('Usuwanie kota');
+                this.$http.delete(prefix + '/api/cats/' + cat.id, {headers: {Authorization: 'Bearer ' + this.tokenRaw}}).then(function () {
+                    this.favourites.splice(this.favourites.indexOf(cat), 1);
+                    console.timeEnd('Usuwanie kota');
+                }, function () {
+                    console.timeEnd('Usuwanie kota');
+                    alert("Błąd przy usuwaniu kota");
+                });
+            },
+            change: function (cat) {
+                this.$http.get(prefix + '/api/cats/random', {headers: {Authorization: 'Bearer ' + this.tokenRaw}}).then(function (data) {
+                    data.json().then(function (catToChange) {
+                        console.time('Zmiana zdjęcia kota');
+                        var newUrl = {
+                            url: catToChange.url
+                        };
+
+                        var headers = {headers: {Authorization: 'Bearer ' + app.tokenRaw, 'Content-Type': 'application/merge-patch+json;charset=UTF-8'}};
+                        app.$http.patch(prefix + '/api/cats/' + cat.id, newUrl, headers).then(function () {
+                            cat.url = catToChange.url;
+                            console.timeEnd('Zmiana zdjęcia kota');
+                        }, function () {
+                            console.timeEnd('Zmiana zdjęcia kota');
+                            alert("Błąd przy zmianie zdjęcia");
+                        });
+                    });
+                }, function () {
+                    alert("DOSTĘP ZABRONIONY");
+                });
+            }
+        },
+        ready: function () {
+            if (localStorage.getItem('token')) {
+                this.tokenRaw = localStorage.getItem('token');
+                console.log(this.tokenRaw);
+                this.token = jwt_decode(this.tokenRaw);
+            }
+            this.$http.get(prefix + '/api/cats').then(function (response) {
+                response.json().then(function (cats) {
+                    app.favourites = cats;
+                });
+            });
+        }
+    });
+
+    Vue.filter('date', function (value) {
+        return new Date(value * 1000).toString()
+    })
+
+</script>
+</body>
+</html>

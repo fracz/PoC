@@ -1,0 +1,32 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+    encoders:
+        AppBundle\Model\UserCredentials: bcrypt
+
+    providers:
+        user_credentials:
+            id: user_credentials_provider
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            anonymous: ~
+            stateless: true
+            pattern: ^/api
+            guard:
+                authenticators:
+                    - jwt_authenticator
+            provider: user_credentials
+
+    access_control:
+        - { path: ^/api/token, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/cats$, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: [GET] }
+        - { path: ^/api/cats-in-html, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api, role: ROLE_USER }
+
+

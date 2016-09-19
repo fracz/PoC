@@ -1,0 +1,9 @@
+imports:
+    - { resource: services/application.yml }
+    - { resource: services/controllers.yml }
+    - { resource: services/commands.yml }
+    - { resource: services/listeners.yml }
+    - { resource: services/repository.yml }
+    - { resource: services/security.yml }
+    - { resource: services/validators.yml }
+    - { resource: services/twig.yml }

@@ -1,0 +1,25 @@
+{
+  "name": "repeka-jwt-poc",
+  "authors": [
+    "Wojciech Frącz <fraczwojciech@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.1.0",
+    "jwt-decode": "^2.1.0",
+    "materialize": "^0.97.7",
+    "vue": "^1.0.26",
+    "vue-resource": "^1.0.2"
+  }
+}

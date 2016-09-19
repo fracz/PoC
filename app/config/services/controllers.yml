@@ -1,0 +1,18 @@
+services:
+    poc.controller.auth:
+        class: AppBundle\Controller\AuthController
+        arguments:
+            - "@form.factory"
+            - "@event_dispatcher"
+            - "@token_generator"
+            - "%jwt.secret.key%"
+
+    poc.controller.cats:
+        class: AppBundle\Controller\CatsController
+        arguments:
+            - "@templating"
+            - "@doctrine.orm.entity_manager"
+            - "@form.factory"
+            - "@security.token_storage"
+            - "@security.authorization_checker"
+            - "@cat.repository.doctrine"

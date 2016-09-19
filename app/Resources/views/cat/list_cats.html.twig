@@ -1,0 +1,17 @@
+<p><strong>Liczba wszystkich kotów:</strong> <span class="badge">{{ cats|length }}</span></p>
+<table class="table">
+    <tr>
+        <th>Lp.</th>
+        <th>Zdjęcie</th>
+        <th>Autor</th>
+        <th>Data utworzenia</th>
+    </tr>
+    {% for cat in cats %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td class="col-xs-6"><img class="img-responsive" src="{{ cat.url }}" alt="Cat" /></td>
+            <td>{{ cat.creator }}</td>
+            <td>{{ cat.created|date('H:i d.m.Y') }}</td>
+        </tr>
+    {% endfor %}
+</table>

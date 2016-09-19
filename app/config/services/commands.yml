@@ -1,0 +1,22 @@
+services:
+    get_username.question:
+        class: Symfony\Component\Console\Question\Question
+        arguments:
+            - "Podaj username\n"
+
+    get_password.question:
+        class: Symfony\Component\Console\Question\Question
+        arguments:
+            - "Podaj password\n"
+
+    add_user_credentials.command:
+        class: AppBundle\Command\AddUserCredentialsCommand
+        arguments:
+            - "@user_credentials.repository"
+            - "@user_credentials.factory"
+            -
+                username: "@get_username.question"
+                password: "@get_password.question"
+
+        tags:
+            - { name: console.command }

@@ -1,0 +1,31 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+{% endblock %}
+
+{% block body %}
+    {% block header %}
+        <header class="container">
+            <div class="row">
+                {% include 'base/header.html.twig' %}
+            </div>
+        </header>
+    {% endblock %}
+
+    {% block content_above %}{% endblock %}
+    <main class="container">
+        <div class="row">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    {% block content_below %}{% endblock %}
+
+    {% block footer %}
+        <footer class="container">
+            <div class="row">
+                {% include 'base/footer.html.twig' %}
+            </div>
+        </footer>
+    {% endblock %}
+{% endblock %}

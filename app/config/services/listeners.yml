@@ -1,0 +1,20 @@
+services:
+    json_request.listener:
+        class: AppBundle\EventListener\JsonRequestListener
+        arguments:
+            - "@security.http_utils"
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    user_logged.listener:
+        class: AppBundle\EventListener\UserLoggedListener
+        arguments:
+            - "@doctrine.orm.entity_manager"
+            - "@user_credentials.repository"
+        tags:
+            - { name: kernel.event_listener, event: user_logged, method: onUserLogged }
+
+    exception.listener:
+        class: AppBundle\EventListener\ExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 10 }

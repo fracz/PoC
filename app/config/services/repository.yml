@@ -1,0 +1,18 @@
+services:
+    user_credentials.repository:
+        alias: user_credentials.repository.doctrine
+
+    user_credentials.repository.doctrine:
+        public: false
+        class: AppBundle\Repository\Doctrine\DoctrineUserCredentialsRepository
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
+    cat.repository:
+        alias: cat.repository.doctrine
+
+    cat.repository.doctrine:
+        public: false
+        class: AppBundle\Repository\Doctrine\DoctrineCatRepository
+        arguments:
+            - "@doctrine.orm.entity_manager"

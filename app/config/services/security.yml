@@ -1,0 +1,17 @@
+services:
+    jwt_authenticator:
+        class: AppBundle\Security\Authenticator
+        arguments:
+            - "@token_generator"
+            - "%jwt.secret.key%"
+
+    user_credentials_provider:
+        class: AppBundle\Security\UserCredentialsProvider
+        arguments:
+            - "@user_credentials.repository"
+
+    cat_voter:
+        public: false
+        class: AppBundle\Security\CatVoter
+        tags:
+            - { name: security.voter }

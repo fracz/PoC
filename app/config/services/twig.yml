@@ -1,0 +1,7 @@
+services:
+    cats.extension:
+        class: AppBundle\Twig\CatsExtension
+        arguments:
+            - "@cat.repository"
+        tags:
+            - { name: twig.extension }

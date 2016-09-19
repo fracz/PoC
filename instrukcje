@@ -1,0 +1,63 @@
+/******************************** CONFIG APACHE *************************************************/
+<VirtualHost *:80>
+	#ServerAdmin szymon.zdebski@biblos.pk.edu.pl
+	ServerName poc-symfony.test.pl
+	DocumentRoot /var/www/poc-symfony/web
+
+	ErrorLog /var/log/apache2/poc-symfony.test.pl-error_log
+	CustomLog /var/log/apache2/poc-symfony.test.pl-access_log combined
+
+	<Directory /var/www/poc-symfony/web>
+		Options +FollowSymLinks -Indexes -MultiViews
+		AllowOverride None
+		#Order Allow,Deny
+		#Allow from All
+		Require all granted
+
+		<IfModule mod_rewrite.c>
+			RewriteEngine On
+
+			RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+			RewriteCond %{REQUEST_FILENAME} !-f
+			RewriteRule ^(.*)$ app.php [QSA,L]
+		</IfModule>
+	</Directory>
+</VirtualHost>
+/******************************** CONFIG APACHE *************************************************/
+
+/******************************** BAZA DANYCH ***************************************************/
+CREATE USER poc WITH PASSWORD 'poc';
+CREATE DATABASE poc;
+CREATE DATABASE poc_test;
+GRANT ALL PRIVILEGES ON DATABASE poc to poc;
+GRANT ALL PRIVILEGES ON DATABASE poc_test to poc;
+
+bin/console doctrine:migrations:migrate --env=test
+bin/console doctrine:migrations:migrate --env=prod
+/******************************** BAZA DANYCH ***************************************************/
+
+/*********************** ODPOWIEDNIE UPRAWNIENIA DO CACHE I LOGS ********************************/
+HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
+sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX /opt/symfony/poc-symfony
+sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX /opt/symfony/poc-symfony
+/*********************** ODPOWIEDNIE UPRAWNIENIA DO CACHE I LOGS ********************************/
+
+/******************************** INSTALACJA ****************************************************/
+DEV: composer install
+PROD SYMFONY_ENV=prod composer install --optimize-autoloader --no-dev
+
+bin/console cache:clear --env=prod --no-debug
+/******************************** INSTALACJA ****************************************************/
+
+/******************************** TESTY *********************************************************/
+vendor/bin/phpspec run
+vendor/bin/phpunit
+/******************************** TESTY *********************************************************/
+
+/******************************** DODAWANIE UŻYTKOWNIKA *****************************************/
+bin/console poc:add-user-credentials --env=prod
+/******************************** DODAWANIE UŻYTKOWNIKA *****************************************/
+
+slow password_verify (bcrypt)
+http://stackoverflow.com/questions/29489318/php-password-verify-and-slow-equals-comparison

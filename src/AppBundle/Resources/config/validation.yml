@@ -1,0 +1,19 @@
+AppBundle\Form\Login:
+    group_sequence:
+        - Login
+        - UserCredentials
+    properties:
+        username:
+            - NotBlank: {}
+        password:
+            - NotBlank: {}
+    constraints:
+        - AppBundle\Validator\Constraints\UserCredentials:
+            message: 'invalid_credentials'
+            groups: [UserCredentials]
+
+AppBundle\Form\AddCat:
+    properties:
+        url:
+            - NotBlank: {}
+            - Url: {}

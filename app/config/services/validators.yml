@@ -1,0 +1,8 @@
+services:
+    user_credentials.validator:
+        class: AppBundle\Validator\Constraints\UserCredentialsValidator
+        arguments:
+            - "@security.password_encoder"
+            - "@user_credentials.repository"
+        tags:
+            - { name: validator.constraint_validator, alias: user_credentials_validator }
