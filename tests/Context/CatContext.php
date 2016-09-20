@@ -8,7 +8,7 @@
 
 namespace Tests\Context;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Repository\CatRepository;
 use AppBundle\Model\Cat;
 
@@ -21,12 +21,12 @@ class CatContext extends BaseContext
 
     /**
      * CatContext constructor.
-     * @param EntityManagerInterface $entityManager
+     * @param DocumentManager $documentManager
      * @param CatRepository $catRepository
      */
-    public function __construct(EntityManagerInterface $entityManager, CatRepository $catRepository)
+    public function __construct(DocumentManager $documentManager, CatRepository $catRepository)
     {
-        parent::__construct($entityManager);
+        parent::__construct($documentManager);
 
         $this->catRepository = $catRepository;
     }
@@ -43,7 +43,7 @@ class CatContext extends BaseContext
             $this->catRepository->add($cat);
             $ids[] = $cat->getId();
         }
-        $this->entityManager->clear();
+        $this->documentManager->clear();
 
         return $ids;
     }

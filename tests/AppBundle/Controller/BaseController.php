@@ -11,12 +11,11 @@ namespace Tests\AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Tests\PurgeDatabase;
+use Doctrine\MongoDB\Connection;
 use Tests\AssertJsonResponse;
 
 abstract class BaseController extends WebTestCase
 {
-    use PurgeDatabase;
     use AssertJsonResponse;
 
     /**
@@ -35,6 +34,8 @@ abstract class BaseController extends WebTestCase
 
         $this->client = static::createClient();
         $this->container = static::$kernel->getContainer();
-        $this->purgeDatabase();
+        /** @var Connection $m */
+        $m = $this->container->get('doctrine_mongodb.odm.default_connection');
+        $m->dropDatabase($this->container->getParameter('mongodb.database.test'));
     }
 }

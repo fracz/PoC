@@ -33,13 +33,13 @@ class CatsControllerTest extends BaseController
         parent::setUp();
 
         $this->userCredentialsContext = new UserCredentialsContext(
-            $this->container->get('doctrine.orm.entity_manager'),
+            $this->container->get('doctrine_mongodb.odm.document_manager'),
             $this->container->get('user_credentials.factory'),
             $this->container->get('user_credentials.repository')
         );
 
         $this->catContext = new CatContext(
-            $this->container->get('doctrine.orm.entity_manager'),
+            $this->container->get('doctrine_mongodb.odm.document_manager'),
             $this->container->get('cat.repository')
         );
     }
@@ -179,9 +179,6 @@ class CatsControllerTest extends BaseController
         self::assertJsonResponse($this->client->getResponse(), Codes::HTTP_BAD_REQUEST);
     }
 
-    /**
-     * @group current
-     */
     public function test_change_url_not_existing_cat()
     {
         $token = $this->createAndLoginUser();

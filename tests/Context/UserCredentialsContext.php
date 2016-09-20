@@ -8,7 +8,7 @@
 
 namespace Tests\Context;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Repository\UserCredentialsRepository;
 use AppBundle\Service\UserCredentialsFactory;
 
@@ -28,16 +28,16 @@ class UserCredentialsContext extends BaseContext
 
     /**
      * UserCredentialsContext constructor.
-     * @param EntityManagerInterface $entityManager
+     * @param DocumentManager $documentManager
      * @param UserCredentialsFactory $userCredentialsFactory
      * @param UserCredentialsRepository $userCredentialsRepository
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
+        DocumentManager $documentManager,
         UserCredentialsFactory $userCredentialsFactory,
         UserCredentialsRepository $userCredentialsRepository
     ) {
-        parent::__construct($entityManager);
+        parent::__construct($documentManager);
 
         $this->userCredentialsFactory = $userCredentialsFactory;
         $this->userCredentialsRepository = $userCredentialsRepository;
@@ -47,6 +47,6 @@ class UserCredentialsContext extends BaseContext
     {
         $userCredentials = $this->userCredentialsFactory->create($username, $password);
         $this->userCredentialsRepository->add($userCredentials);
-        $this->entityManager->clear();
+        $this->documentManager->clear();
     }
 }

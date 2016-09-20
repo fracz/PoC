@@ -32,27 +32,44 @@ twig:
     strict_variables: "%kernel.debug%"
 
 # Doctrine Configuration
-doctrine:
-    dbal:
-        driver:   "%database.driver%"
-        host:     "%database.host%"
-        port:     "%database.port%"
-        dbname:   "%database.name%"
-        user:     "%database.user%"
-        password: "%database.password%"
-        charset:  UTF8
+#doctrine:
+#    dbal:
+#        driver:   "%database.driver%"
+#        host:     "%database.host%"
+#        port:     "%database.port%"
+#        dbname:   "%database.name%"
+#        user:     "%database.user%"
+#        password: "%database.password%"
+#        charset:  UTF8
+#
+#    orm:
+#        auto_generate_proxy_classes: "%kernel.debug%"
+#        naming_strategy: doctrine.orm.naming_strategy.underscore
+#        auto_mapping: false
+#        mappings:
+#            AppBundle:
+#                type: xml
+#                prefix: AppBundle\Model
+#                is_bundle: false
+#                dir: "%kernel.root_dir%/../src/AppBundle/Mappings"
+#                alias: Model
 
-    orm:
-        auto_generate_proxy_classes: "%kernel.debug%"
-        naming_strategy: doctrine.orm.naming_strategy.underscore
-        auto_mapping: false
-        mappings:
-            AppBundle:
-                type: xml
-                prefix: AppBundle\Model
-                is_bundle: false
-                dir: "%kernel.root_dir%/../src/AppBundle/Mappings"
-                alias: Model
+doctrine_mongodb:
+    connections:
+        default:
+            server: "%mongodb.server%"
+            options: {}
+    default_database: "%mongodb.database%"
+    document_managers:
+        default:
+            auto_mapping: false
+            mappings:
+                AppBundle:
+                    type: xml
+                    prefix: AppBundle\Model
+                    is_bundle: false
+                    alias: Model
+                    dir: "%kernel.root_dir%/../src/AppBundle/Mappings"
 
 accelerator_cache:
     host: "%apc.cache%"

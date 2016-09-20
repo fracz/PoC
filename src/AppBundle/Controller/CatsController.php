@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use AppBundle\Repository\CatRepository;
 use AppBundle\Form\Type\AddCatType;
@@ -51,9 +51,9 @@ class CatsController
      */
     private $authorizationChecker;
     /**
-     * @var EntityManagerInterface
+     * @var DocumentManager
      */
-    private $entityManager;
+    private $documentManager;
     /**
      * @var EngineInterface
      */
@@ -62,7 +62,7 @@ class CatsController
     /**
      * CatsController constructor.
      * @param EngineInterface $engine
-     * @param EntityManagerInterface $entityManager
+     * @param DocumentManager $documentManager
      * @param FormFactoryInterface $formFactory
      * @param TokenStorageInterface $tokenStorage
      * @param AuthorizationCheckerInterface $authorizationChecker
@@ -70,14 +70,14 @@ class CatsController
      */
     public function __construct(
         EngineInterface $engine,
-        EntityManagerInterface $entityManager,
+        DocumentManager $documentManager,
         FormFactoryInterface $formFactory,
         TokenStorageInterface $tokenStorage,
         AuthorizationCheckerInterface $authorizationChecker,
         CatRepository $catRepository
     ) {
         $this->engine = $engine;
-        $this->entityManager = $entityManager;
+        $this->documentManager = $documentManager;
         $this->formFactory = $formFactory;
         $this->tokenStorage = $tokenStorage;
         $this->authorizationChecker = $authorizationChecker;
@@ -145,7 +145,7 @@ class CatsController
      * @param Request $request
      * @param $id
      * @return Response
-     * @Route("/cats/{id}", name="change_cat_url", requirements={"id": "\d+"}, methods={"PATCH"})
+     * @Route("/cats/{id}", name="change_cat_url", requirements={"id": "\w+"}, methods={"PATCH"})
      */
     public function changeCatUrlAction(Request $request, $id)
     {
@@ -158,9 +158,8 @@ class CatsController
         if ($form->isValid()) {
             /** @var ChangeCat $data */
             $data = $form->getData();
-            $this->entityManager->transactional(function () use ($cat, $data) {
-                $cat->changeUrl($data->url);
-            });
+            $cat->changeUrl($data->url);
+            $this->documentManager->flush($cat);
 
             return new JsonResponse(null, Codes::HTTP_NO_CONTENT);
         }
@@ -169,7 +168,7 @@ class CatsController
     }
 
     /**
-     * @Route("/cats/{id}", name="delete_cat", requirements={"id": "\d+"}, methods={"DELETE"})
+     * @Route("/cats/{id}", name="delete_cat", requirements={"id": "\w+"}, methods={"DELETE"})
      * @return Response
      */
     public function deleteCatAction( $id)

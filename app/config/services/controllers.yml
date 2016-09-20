@@ -11,8 +11,8 @@ services:
         class: AppBundle\Controller\CatsController
         arguments:
             - "@templating"
-            - "@doctrine.orm.entity_manager"
+            - "@doctrine_mongodb.odm.document_manager"
             - "@form.factory"
             - "@security.token_storage"
             - "@security.authorization_checker"
-            - "@cat.repository.doctrine"
+            - "@cat.repository"

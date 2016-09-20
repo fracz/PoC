@@ -8,16 +8,16 @@
 
 namespace AppBundle\EventListener;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Event\UserLoggedEvent;
 use AppBundle\Repository\UserCredentialsRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 class UserLoggedListener
 {
     /**
-     * @var EntityManagerInterface
+     * @var DocumentManager
      */
-    private $entityManager;
+    private $documentManager;
     /**
      * @var UserCredentialsRepository
      */
@@ -25,12 +25,12 @@ class UserLoggedListener
 
     /**
      * UserLoggedListener constructor.
-     * @param EntityManagerInterface $entityManager
+     * @param DocumentManager $documentManager
      * @param UserCredentialsRepository $userCredentialsRepository
      */
-    public function __construct(EntityManagerInterface $entityManager, UserCredentialsRepository $userCredentialsRepository)
+    public function __construct(DocumentManager $documentManager, UserCredentialsRepository $userCredentialsRepository)
     {
-        $this->entityManager = $entityManager;
+        $this->documentManager = $documentManager;
         $this->userCredentialsRepository = $userCredentialsRepository;
     }
 
@@ -38,8 +38,7 @@ class UserLoggedListener
     {
         $userCredentials = $this->userCredentialsRepository->findByUsername($event->getUsername());
 
-        $this->entityManager->transactional(function (EntityManagerInterface $em) use ($event, $userCredentials) {
-            $userCredentials->loginSuccessfully($event->getLastLogin(), $event->getIp());
-        });
+        $userCredentials->loginSuccessfully($event->getLastLogin(), $event->getIp());
+        $this->documentManager->flush($userCredentials);
     }
 }

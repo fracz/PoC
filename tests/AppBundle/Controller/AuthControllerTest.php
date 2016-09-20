@@ -23,7 +23,7 @@ class AuthControllerTest extends BaseController
         parent::setUp();
 
         $this->userCredentialsContext = new UserCredentialsContext(
-            $this->container->get('doctrine.orm.entity_manager'),
+            $this->container->get('doctrine_mongodb.odm.document_manager'),
             $this->container->get('user_credentials.factory'),
             $this->container->get('user_credentials.repository')
         );

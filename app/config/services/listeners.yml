@@ -9,7 +9,7 @@ services:
     user_logged.listener:
         class: AppBundle\EventListener\UserLoggedListener
         arguments:
-            - "@doctrine.orm.entity_manager"
+            - "@doctrine_mongodb.odm.document_manager"
             - "@user_credentials.repository"
         tags:
             - { name: kernel.event_listener, event: user_logged, method: onUserLogged }

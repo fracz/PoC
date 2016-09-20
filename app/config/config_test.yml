@@ -12,7 +12,5 @@ web_profiler:
     toolbar: false
     intercept_redirects: false
 
-doctrine:
-    dbal:
-        driver_class: Tests\PgSqlDriver
-        dbname:   "%database.name.test%"
+doctrine_mongodb:
+    default_database: "%mongodb.database.test%"

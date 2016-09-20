@@ -1,18 +1,30 @@
 services:
     user_credentials.repository:
-        alias: user_credentials.repository.doctrine
+        alias: user_credentials.repository.mongodb
 
-    user_credentials.repository.doctrine:
+#    user_credentials.repository.doctrine:
+#        public: false
+#        class: AppBundle\Repository\Doctrine\DoctrineUserCredentialsRepository
+#        arguments:
+#            - "@doctrine.orm.entity_manager"
+
+    user_credentials.repository.mongodb:
         public: false
-        class: AppBundle\Repository\Doctrine\DoctrineUserCredentialsRepository
+        class: AppBundle\Repository\Mongodb\DoctrineUserCredentialsRepository
         arguments:
-            - "@doctrine.orm.entity_manager"
+            - "@doctrine_mongodb.odm.document_manager"
 
     cat.repository:
-        alias: cat.repository.doctrine
+        alias: cat.repository.mongodb
 
-    cat.repository.doctrine:
+#    cat.repository.doctrine:
+#        public: false
+#        class: AppBundle\Repository\Doctrine\DoctrineCatRepository
+#        arguments:
+#            - "@doctrine.orm.entity_manager"
+
+    cat.repository.mongodb:
         public: false
-        class: AppBundle\Repository\Doctrine\DoctrineCatRepository
+        class: AppBundle\Repository\Mongodb\DoctrineCatRepository
         arguments:
-            - "@doctrine.orm.entity_manager"
+            - "@doctrine_mongodb.odm.document_manager"

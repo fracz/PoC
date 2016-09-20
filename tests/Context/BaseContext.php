@@ -8,22 +8,21 @@
 
 namespace Tests\Context;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 abstract class BaseContext
 {
     /**
-     * @var EntityManagerInterface
+     * @var DocumentManager
      */
-    protected $entityManager;
+    protected $documentManager;
 
     /**
-     * UserCredentialsContext constructor.
-     * @param EntityManagerInterface $entityManager
+     * BaseContext constructor.
+     * @param DocumentManager $documentManager
      */
-    public function __construct(
-        EntityManagerInterface $entityManager
-    ) {
-        $this->entityManager = $entityManager;
+    public function __construct(DocumentManager $documentManager)
+    {
+        $this->documentManager = $documentManager;
     }
 }
