@@ -16,3 +16,4 @@ services:
             - "@security.token_storage"
             - "@security.authorization_checker"
             - "@cat.repository"
+            - "@cat.generator"

@@ -6,3 +6,14 @@ services:
 
     token_generator:
         class: AppBundle\Token\FirebaseTokenGeneratorAdapter
+
+    cat.generator:
+        alias: cat.generator.static
+
+    cat.generator.static:
+        public: false
+        class: AppBundle\Service\StaticRandomCatGenerator
+
+    cat.generator.dynamic:
+        public: false
+        class: AppBundle\Service\DynamicRandomCatGenerator
