@@ -37,4 +37,9 @@ abstract class BaseController extends WebTestCase
         $this->container = static::$kernel->getContainer();
         $this->purgeDatabase();
     }
+
+    protected function clearEntityManager()
+    {
+        $this->container->get('doctrine.orm.entity_manager')->clear();
+    }
 }

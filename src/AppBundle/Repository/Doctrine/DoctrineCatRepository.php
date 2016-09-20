@@ -52,14 +52,16 @@ class DoctrineCatRepository implements CatRepository
     {
         $qb = $this->entityManager->createQueryBuilder();
 
-        $qb->select('c')
+        $qb->select('c, o')
             ->from('Model:Cat', 'c')
+            ->innerJoin('c.creator', 'o')
             ->orderBy('c.created', 'DESC');
 
         $query = $qb->getQuery();
 
         return array_map(function ($cat) {
             $cat['created'] = $cat['created']->getTimestamp();
+            $cat['creator'] = $cat['creator']['username'];
             return $cat;
         }, $query->getArrayResult());
     }

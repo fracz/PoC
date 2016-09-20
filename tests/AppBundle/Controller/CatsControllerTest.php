@@ -17,6 +17,8 @@ use AppBundle\Model\Cat;
 class CatsControllerTest extends BaseController
 {
     const CAT_URL = 'http://cat.pl';
+    const USERNAME = 'username';
+    const PASSWORD = 'password';
 
     /**
      * @var UserCredentialsContext
@@ -56,9 +58,10 @@ class CatsControllerTest extends BaseController
 
     public function test_not_empty_list_cats_in_system()
     {
+        $owner = $this->userCredentialsContext->createUserCredentialsInSystem(self::USERNAME, self::PASSWORD);
         $this->catContext->addCats([
-            new Cat('http://cat1.pl', 'creator', new \DateTimeImmutable()),
-            new Cat('http://cat2.pl', 'creator', new \DateTimeImmutable())
+            new Cat('http://cat1.pl', $owner, new \DateTimeImmutable()),
+            new Cat('http://cat2.pl', $owner, new \DateTimeImmutable())
         ]);
 
         $this->client->request('GET', '/api/cats');
@@ -179,9 +182,6 @@ class CatsControllerTest extends BaseController
         self::assertJsonResponse($this->client->getResponse(), Codes::HTTP_BAD_REQUEST);
     }
 
-    /**
-     * @group current
-     */
     public function test_change_url_not_existing_cat()
     {
         $token = $this->createAndLoginUser();
@@ -200,8 +200,9 @@ class CatsControllerTest extends BaseController
 
     public function test_change_url_not_own_cat()
     {
+        $userCredentials = $this->userCredentialsContext->createUserCredentialsInSystem(self::USERNAME . 'other', self::PASSWORD);
         $cat = $this->catContext->addCats([
-            new Cat(self::CAT_URL, 'not_my_cat_creator', new \DateTimeImmutable())
+            new Cat(self::CAT_URL, $userCredentials, new \DateTimeImmutable())
         ]);
 
         $token = $this->createAndLoginUser();
@@ -220,11 +221,12 @@ class CatsControllerTest extends BaseController
 
     public function test_change_url_successfully()
     {
+        $userCredentials = $this->userCredentialsContext->createUserCredentialsInSystem(self::USERNAME, self::PASSWORD);
         $cat = $this->catContext->addCats([
-            new Cat(self::CAT_URL, UserCredentialsContext::USERNAME, new \DateTimeImmutable())
+            new Cat(self::CAT_URL, $userCredentials, new \DateTimeImmutable())
         ]);
 
-        $token = $this->createAndLoginUser();
+        $token = $this->loginUserInTheSystem();
 
         $this->client->request(
             'PATCH',
@@ -240,11 +242,12 @@ class CatsControllerTest extends BaseController
 
     public function test_change_url_with_empty_url()
     {
+        $userCredentials = $this->userCredentialsContext->createUserCredentialsInSystem(self::USERNAME, self::PASSWORD);
         $cat = $this->catContext->addCats([
-            new Cat(self::CAT_URL, UserCredentialsContext::USERNAME, new \DateTimeImmutable())
+            new Cat(self::CAT_URL, $userCredentials, new \DateTimeImmutable())
         ]);
 
-        $token = $this->createAndLoginUser();
+        $token = $this->loginUserInTheSystem();
 
         $this->client->request(
             'PATCH',
@@ -269,8 +272,9 @@ class CatsControllerTest extends BaseController
 
     public function test_remove_not_own_cat()
     {
+        $userCredentialsOther = $this->userCredentialsContext->createUserCredentialsInSystem(self::USERNAME . '_other', self::PASSWORD);
         $cat = $this->catContext->addCats([
-            new Cat(self::CAT_URL, 'not_my_cat_creator', new \DateTimeImmutable())
+            new Cat(self::CAT_URL, $userCredentialsOther, new \DateTimeImmutable())
         ]);
 
         $token = $this->createAndLoginUser();
@@ -282,22 +286,18 @@ class CatsControllerTest extends BaseController
 
     public function test_remove_cat()
     {
+        $userCredentials = $this->userCredentialsContext->createUserCredentialsInSystem(self::USERNAME, self::PASSWORD);
         $cat = $this->catContext->addCats([
-            new Cat(self::CAT_URL, UserCredentialsContext::USERNAME, new \DateTimeImmutable())
+            new Cat(self::CAT_URL, $userCredentials, new \DateTimeImmutable())
         ]);
 
-        $token = $this->createAndLoginUser();
+        $token = $this->loginUserInTheSystem();
 
         $this->client->request('DELETE', '/api/cats/' . $cat[0], [], [], ['HTTP_AUTHORIZATION' => 'Bearer ' . $token]);
 
         self::assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
     }
 
-    /**
-     * @param string $username
-     * @param string $password
-     * @return string
-     */
     private function loginUserInTheSystem($username = UserCredentialsContext::USERNAME, $password = UserCredentialsContext::PASSWORD)
     {
         $this->client->request(
@@ -322,7 +322,7 @@ class CatsControllerTest extends BaseController
      */
     private function createAndLoginUser($username = UserCredentialsContext::USERNAME, $password = UserCredentialsContext::PASSWORD)
     {
-        $this->userCredentialsContext->createUserCredentialsInSystem($username, $password);
+        $this->userCredentialsContext->createUserCredentialsInSystem($username, $password, true);
 
         $token = $this->loginUserInTheSystem($username, $password);
         return $token;

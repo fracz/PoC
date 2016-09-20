@@ -5,6 +5,7 @@ namespace spec\AppBundle\Model;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use AppBundle\Model\Cat;
+use AppBundle\Model\UserCredentials;
 
 /**
  * Class CatSpec
@@ -17,19 +18,15 @@ class CatSpec extends ObjectBehavior
     const CREATOR = 'creator';
     const CREATED = '2015-05-05 20:20:20';
 
-    function let()
+    function let(UserCredentials $userCredentials)
     {
-        $this->beConstructedWith(self::URL, self::CREATOR, $this->getCreatedDate());
+        $userCredentials->getUsername()->willReturn(self::CREATOR);
+        $this->beConstructedWith(self::URL, $userCredentials, $this->getCreatedDate());
     }
 
-    function it_throw_exception_when_not_pass_url()
+    function it_throw_exception_when_not_pass_url(UserCredentials $userCredentials)
     {
-        $this->shouldThrow(\InvalidArgumentException::class)->during('__construct', [null, self::CREATOR, $this->getCreatedDate()]);
-    }
-
-    function it_throw_exception_when_not_pass_creator()
-    {
-        $this->shouldThrow(\InvalidArgumentException::class)->during('__construct', [self::URL, null, $this->getCreatedDate()]);
+        $this->shouldThrow(\InvalidArgumentException::class)->during('__construct', [null, $userCredentials, $this->getCreatedDate()]);
     }
 
     function it_is_initializable()

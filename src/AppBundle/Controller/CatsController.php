@@ -127,7 +127,7 @@ class CatsController
             /** @var AddCat $addCat */
             $addCat = $form->getData();
 
-            $cat = new Cat($addCat->url, $this->tokenStorage->getToken()->getUsername(), new \DateTimeImmutable());
+            $cat = new Cat($addCat->url, $this->tokenStorage->getToken()->getUser(), new \DateTimeImmutable());
             $this->catRepository->add($cat);
 
             return new JsonResponse([

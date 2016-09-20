@@ -43,10 +43,20 @@ class UserCredentialsContext extends BaseContext
         $this->userCredentialsRepository = $userCredentialsRepository;
     }
 
-    public function createUserCredentialsInSystem($username, $password)
+    /**
+     * @param $username
+     * @param $password
+     * @param bool $clear
+     * @return \AppBundle\Model\UserCredentials
+     */
+    public function createUserCredentialsInSystem($username, $password, $clear = false)
     {
         $userCredentials = $this->userCredentialsFactory->create($username, $password);
         $this->userCredentialsRepository->add($userCredentials);
-        $this->entityManager->clear();
+        if ($clear) {
+            $this->entityManager->clear();
+        }
+
+        return $userCredentials;
     }
 }

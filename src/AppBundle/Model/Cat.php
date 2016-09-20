@@ -6,6 +6,9 @@ class Cat
 {
     private $id;
     private $url;
+    /**
+     * @var UserCredentials
+     */
     private $creator;
     /**
      * @var \DateTimeInterface
@@ -15,12 +18,12 @@ class Cat
     /**
      * Cat constructor.
      * @param $url
-     * @param $creator
+     * @param UserCredentials $creator
      * @param \DateTimeInterface $created
      */
-    public function __construct($url, $creator, \DateTimeInterface $created)
+    public function __construct($url, UserCredentials $creator, \DateTimeInterface $created)
     {
-        $this->guardMe($url, $creator);
+        $this->guardMe($url);
 
         $this->url = $url;
         $this->creator = $creator;
@@ -34,17 +37,13 @@ class Cat
 
     public function getCreator()
     {
-        return $this->creator;
+        return $this->creator->getUsername();
     }
 
-    private function guardMe($url, $creator)
+    private function guardMe($url)
     {
         if (!isset($url) || empty($url)) {
             throw new \InvalidArgumentException('Url must be');
-        }
-
-        if (!isset($creator) || empty($creator)) {
-            throw new \InvalidArgumentException('Creator must be');
         }
     }
 
