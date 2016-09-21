@@ -39,13 +39,13 @@ bin/console doctrine:migrations:migrate --env=prod
 
 /*********************** ODPOWIEDNIE UPRAWNIENIA DO CACHE I LOGS ********************************/
 HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
-sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX /opt/symfony/poc-symfony
-sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX /opt/symfony/poc-symfony
+sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX /opt/symfony/poc
+sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX /opt/symfony/poc
 /*********************** ODPOWIEDNIE UPRAWNIENIA DO CACHE I LOGS ********************************/
 
 /******************************** INSTALACJA ****************************************************/
 DEV: composer install
-PROD SYMFONY_ENV=prod composer install --optimize-autoloader --no-dev
+PROD: SYMFONY_ENV=prod composer install --optimize-autoloader --no-dev
 
 bin/console cache:clear --env=prod --no-debug
 /******************************** INSTALACJA ****************************************************/
@@ -58,6 +58,9 @@ vendor/bin/phpunit
 /******************************** DODAWANIE UŻYTKOWNIKA *****************************************/
 bin/console poc:add-user-credentials --env=prod
 /******************************** DODAWANIE UŻYTKOWNIKA *****************************************/
+
+COPY .env.dist TO .env
+COPY .gitignore.dist to .gitignore
 
 slow password_verify (bcrypt)
 http://stackoverflow.com/questions/29489318/php-password-verify-and-slow-equals-comparison
