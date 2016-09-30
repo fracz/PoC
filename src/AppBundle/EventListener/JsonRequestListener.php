@@ -9,6 +9,7 @@
 namespace AppBundle\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Utils\Codes;
@@ -67,5 +68,14 @@ class JsonRequestListener
         }
 
         return $data;
+    }
+
+    public function ontKernelView(GetResponseForControllerResultEvent $event)
+    {
+        $controllerResult = $event->getControllerResult();
+        $data = array_key_exists('data', $controllerResult) ? $controllerResult['data'] : null;
+        $status = array_key_exists('status', $controllerResult) ? $controllerResult['status'] : Codes::HTTP_OK;
+
+        $event->setResponse(new JsonResponse($data, $status));
     }
 }

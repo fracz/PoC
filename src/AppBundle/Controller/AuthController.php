@@ -8,8 +8,6 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -63,7 +61,7 @@ class AuthController
     /**
      * @param Request $request
      * @Route("/token", name="auth_token", methods={"POST"})
-     * @return Response
+     * @return array
      */
     public function tokenAction(Request $request)
     {
@@ -76,10 +74,14 @@ class AuthController
 
             $this->dispatchUserLoggedEvent($request, $data);
 
-            return new JsonResponse(['token' => $this->createToken($data)]);
+            return [
+                'data' => ['token' => $this->createToken($data)]
+            ];
         }
 
-        return new JsonResponse(null, Codes::HTTP_UNAUTHORIZED);
+        return [
+            'status' => Codes::HTTP_UNAUTHORIZED
+        ];
     }
 
     /**

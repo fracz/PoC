@@ -8,8 +8,6 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -102,26 +100,30 @@ class CatsController
 
     /**
      * @Route("/cats", name="all_cats", methods={"GET"})
-     * @return JsonResponse
+     * @return array
      */
     public function getCatsAction()
     {
-        return new JsonResponse($this->catRepository->getAllCatsToList());
+        return [
+            'data' => $this->catRepository->getAllCatsToList()
+        ];
     }
 
     /**
      * @Route("/cats/random", name="random_cats", methods={"GET"})
-     * @return JsonResponse
+     * @return array
      */
     public function randomAction()
     {
-        return new JsonResponse(['url' => $this->randomCatGenerator->getCatUrl()]);
+        return [
+            'data' => ['url' => $this->randomCatGenerator->getCatUrl()]
+        ];
     }
 
     /**
      * @param Request $request
      * @Route("/cats", name="add_cat", methods={"POST"})
-     * @return Response
+     * @return array
      */
     public function addCatAction(Request $request)
     {
@@ -135,21 +137,27 @@ class CatsController
             $cat = new Cat($addCat->url, $this->tokenStorage->getToken()->getUser(), new \DateTimeImmutable());
             $this->catRepository->add($cat);
 
-            return new JsonResponse([
-                'id' => $cat->getId(),
-                'url' => $cat->getUrl(),
-                'creator' => $cat->getCreator(),
-                'created' => $cat->getCreated()
-            ], Codes::HTTP_CREATED);
+            return [
+                'data' => [
+                    'id' => $cat->getId(),
+                    'url' => $cat->getUrl(),
+                    'creator' => $cat->getCreator(),
+                    'created' => $cat->getCreated()
+                ],
+                'status' => Codes::HTTP_CREATED
+            ];
         }
 
-        return new JsonResponse(['error' => 'invalid data'], Codes::HTTP_BAD_REQUEST);
+        return [
+            'data' => ['error' => 'invalid data'],
+            'status' => Codes::HTTP_BAD_REQUEST
+        ];
     }
 
     /**
      * @param Request $request
      * @param $id
-     * @return Response
+     * @return array
      * @Route("/cats/{id}", name="change_cat_url", requirements={"id": "\d+"}, methods={"PATCH"})
      */
     public function changeCatUrlAction(Request $request, $id)
@@ -167,15 +175,20 @@ class CatsController
                 $cat->changeUrl($data->url);
             });
 
-            return new JsonResponse(null, Codes::HTTP_NO_CONTENT);
+            return [
+                'status' => Codes::HTTP_NO_CONTENT
+            ];
         }
 
-        return new JsonResponse(['error' => 'invalid data'], Codes::HTTP_BAD_REQUEST);
+        return [
+            'data' => ['error' => 'invalid data'],
+            'status' => Codes::HTTP_BAD_REQUEST
+        ];
     }
 
     /**
      * @Route("/cats/{id}", name="delete_cat", requirements={"id": "\d+"}, methods={"DELETE"})
-     * @return Response
+     * @return array
      */
     public function deleteCatAction( $id)
     {
@@ -184,7 +197,9 @@ class CatsController
 
         $this->catRepository->remove($cat);
 
-        return new JsonResponse(null, Codes::HTTP_NO_CONTENT);
+        return [
+            'status' => Codes::HTTP_NO_CONTENT
+        ];
     }
 
     private function getCatWithId($id)

@@ -5,6 +5,7 @@ services:
             - "@security.http_utils"
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            - { name: kernel.event_listener, event: kernel.view, method: ontKernelView }
 
     user_logged.listener:
         class: AppBundle\EventListener\UserLoggedListener
